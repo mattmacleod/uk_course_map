@@ -4,7 +4,7 @@ class UnistatsInstitution < ActiveRecord::Base
 
   def self.import!
 
-    ukprnmap = UnistatsUkprnmap.all.inject({}) { |acc,val| acc[val.ukprn] = val.name; acc }
+    ukprnmap = UnistatsUkprnmap.all.inject({}) { |acc,val| acc[val.ukprn.strip] = val.name; acc }
 
     self.all.each do |inst|
 
@@ -21,7 +21,7 @@ class UnistatsInstitution < ActiveRecord::Base
       cost = cost.empty? ? nil : cost.sum / cost.length
 
       app_in.attributes = {
-        :name               => ukprnmap[inst.UKPRN],
+        :name               => ukprnmap[inst.UKPRN.to_s],
         :url_accommodation  => inst.ACCOMURL,
         :accommodation_cost => cost,
         :country            => country
