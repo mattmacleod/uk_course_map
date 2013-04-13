@@ -6,3 +6,11 @@ development:
   host: 127.0.0.1
   encoding: utf8
 
+unistats:
+  database: UNISTATS
+  adapter: mysql2
+  username: tictoc
+  password: clockwork
+  host: 127.0.0.1
+  encoding: utf8
+  
