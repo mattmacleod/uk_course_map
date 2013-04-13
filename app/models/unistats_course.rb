@@ -11,12 +11,6 @@ class UnistatsCourse < ActiveRecord::Base
 
 	def self.import!
 
-		Array.class_eval do
-			def _average
-				sum / count
-			end
-		end
-
 		institutions = Institution.all.inject({}) { |acc,val| acc[val.unistats_id.to_s] = val; acc }
 
 		self.includes(:unistats_continuation, :unistats_employment, :unistats_entry, :unistats_nss).all.each do |external_course|

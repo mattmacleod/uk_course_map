@@ -15,3 +15,6 @@ end
 
 gem 'jquery-rails'
 gem 'will_paginate'
+
+gem "pry-rails"
+gem "pry-debugger"

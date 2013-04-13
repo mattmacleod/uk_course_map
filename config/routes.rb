@@ -6,4 +6,6 @@ UkCourseMap::Application.routes.draw do
   get "jacs/:jacs_code/courses.json" => "search#getcoursesfromjac"
   get "courses.json"          => "search#getcourses"
 
+  get "level1" => "search#level1"
+
 end

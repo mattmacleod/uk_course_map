@@ -20,4 +20,16 @@ class SearchController < ApplicationController
     end
 
 
+    def level1
+    	output = {}
+    	
+    	jobs = Job.all
+    	categories = JacsCode.categories
+    	
+    	output[:categories] = categories.map {|c| {:category => c, :weights => jobs.map {|j| c.weight_to(j) } } }
+		output[:jobs] = jobs
+
+    	render :json => output
+    end
+
 end
