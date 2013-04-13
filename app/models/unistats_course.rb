@@ -5,12 +5,20 @@ class UnistatsCourse < ActiveRecord::Base
 
 	has_one :unistats_continuation, :foreign_key => "parentId"
 	has_one :unistats_employment, :foreign_key => "parentId"
+	has_one :unistats_entry, :foreign_key => "parentId"
+	has_one :unistats_nss, :foreign_key => "parentId"
 
 	def self.import!
 
+		Array.class_eval do
+			def _average
+				sum / count
+			end
+		end
+
 		institutions = Institution.all.inject({}) { |acc,val| acc[val.unistats_id.to_s] = val; acc }
 
-		self.includes(:unistats_continuation, :unistats_employment).all.each do |external_course|
+		self.includes(:unistats_continuation, :unistats_employment, :unistats_entry, :unistats_nss).all.each do |external_course|
 
 			course = Course.find_or_create_by_kis_course_id(external_course.KISCOURSEID)
 
@@ -28,6 +36,14 @@ class UnistatsCourse < ActiveRecord::Base
 
 			continuation = external_course.unistats_continuation
 			employment = external_course.unistats_employment
+			entry = external_course.unistats_entry
+			nss = external_course.unistats_nss
+
+			nss_teaching = ([:Q1, :Q2, :Q3, :Q4].map{|m| nss.send(m).to_i}._average) if nss
+			nss_feedback = ([:Q5, :Q6, :Q7, :Q8, :Q9].map{|m| nss.send(m).to_i}._average) if nss
+			nss_academic = ([:Q10, :Q11, :Q12].map{|m| nss.send(m).to_i}._average) if nss
+			nss_resources = ([:Q16, :Q17, :Q18].map{|m| nss.send(m).to_i}._average) if nss
+			nss_personal_development = ([:Q19].map{|m| nss.send(m).to_i}._average) if nss
 
 			course.attributes = {
 				:institution_id => institution.id,
@@ -57,20 +73,20 @@ class UnistatsCourse < ActiveRecord::Base
 				:outcome_study => (employment.STUDY.to_i if employment),
 				:outcome_unemployed => (employment.ASSUNEMP.to_i if employment),
 				
-				# :qualification_access => external_course.,
-				# :qualification_a_level => external_course.,
-				# :qualification_bacc => external_course.,
-				# :qualification_degree => external_course.,
-				# :qualification_foundation => external_course.,
-				# :qualification_none => external_course.,
-				# :qualification_other => external_course.,
-				# :qualification_other_he => external_course.,
+				:qualification_access => (entry.ACCESS.to_i if entry),
+				:qualification_a_level => (entry.ALEVEL.to_i if entry),
+				:qualification_bacc => (entry.BACC.to_i if entry),
+				:qualification_degree => (entry.DEGREE.to_i if entry),
+				:qualification_foundation => (entry.FOUNDATION.to_i if entry),
+				:qualification_none => (entry.NOQUALS.to_i if entry),
+				:qualification_other => (entry.OTHER.to_i if entry),
+				:qualification_other_he => (entry.OTHERHE.to_i if entry),
 				
-				# :nss_teaching => external_course.,
-				# :nss_feedback => external_course.,
-				# :nss_academic => external_course.,
-				# :nss_resources => external_course.,
-				# :nss_personal_development => external_course.,
+				:nss_teaching => nss_teaching,
+				:nss_feedback => nss_feedback,
+				:nss_academic => nss_academic,
+				:nss_resources => nss_resources,
+				:nss_personal_development => nss_personal_development
 				
 				# :salary_subject_average => external_course.,
 				# :salary_course_average => tst
