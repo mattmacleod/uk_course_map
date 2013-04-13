@@ -1,16 +1,16 @@
 development:
   database: uk_course_map_dev
   adapter: mysql2
-  username: tictoc
-  password: clockwork
+  username: root
+  password: 
   host: 127.0.0.1
   encoding: utf8
 
 unistats:
   database: UNISTATS
   adapter: mysql2
-  username: tictoc
-  password: clockwork
+  username: root
+  password: 
   host: 127.0.0.1
   encoding: utf8
   
