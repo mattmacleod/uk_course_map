@@ -1,0 +1,27 @@
+= respond-to($groups)
+
+	$breakpoint_count: length($responsive-breakpoints)
+	$n: 1
+
+	@each $breakpoint in $responsive-breakpoints
+
+		$this-name: nth($breakpoint,1)
+		$this-size: nth($breakpoint,2)
+
+		@if includes($groups, $this-name)
+
+			@if $n==1
+				@media only screen and (max-width: $this-size)
+					@content
+
+			@else if $n > 1 and $n < $breakpoint_count+1
+				@media only screen and (min-width: $last-size + 1) and (max-width: $this-size)
+					@content
+
+			@else
+				@media only screen and (min-width: $this-size)
+					@content
+
+		$n: $n + 1
+		$last-size: $this-size
+		
