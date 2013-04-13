@@ -1,7 +1,7 @@
 class CreateInstitutions < ActiveRecord::Migration
   def change
     create_table :institutions do |t|
-      t.string :title
+      t.string :name
       t.string :ukprn
       t.string :url_accommodation
       t.integer :accommodation_cost
