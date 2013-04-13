@@ -4,12 +4,13 @@ class UnistatsCourse < ActiveRecord::Base
 	set_primary_key :recordId
 
 	has_one :unistats_continuation, :foreign_key => "parentId"
+	has_one :unistats_employment, :foreign_key => "parentId"
 
 	def self.import!
 
 		institutions = Institution.all.inject({}) { |acc,val| acc[val.unistats_id.to_s] = val; acc }
 
-		self.includes(:unistats_continuation).all.each do |external_course|
+		self.includes(:unistats_continuation, :unistats_employment).all.each do |external_course|
 
 			course = Course.find_or_create_by_kis_course_id(external_course.KISCOURSEID)
 
@@ -26,6 +27,7 @@ class UnistatsCourse < ActiveRecord::Base
 			}
 
 			continuation = external_course.unistats_continuation
+			employment = external_course.unistats_employment
 
 			course.attributes = {
 				:institution_id => institution.id,
@@ -51,9 +53,9 @@ class UnistatsCourse < ActiveRecord::Base
 				:success_partial => (continuation.ULOWER.to_i if continuation),
 				:success_failure => (continuation.ULEFT.to_i if continuation),
 				
-				# :outcome_work => external_course.,
-				# :outcome_study => external_course.,
-				# :outcome_unemployed => external_course.,
+				:outcome_work => (employment.WORK.to_i if employment),
+				:outcome_study => (employment.STUDY.to_i if employment),
+				:outcome_unemployed => (employment.ASSUNEMP.to_i if employment),
 				
 				# :qualification_access => external_course.,
 				# :qualification_a_level => external_course.,
