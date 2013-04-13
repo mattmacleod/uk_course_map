@@ -25,7 +25,6 @@ ActiveRecord::Schema.define(:version => 20130413120218) do
     t.string   "title"
     t.string   "kis_course_id"
     t.integer  "institution_id"
-    t.string   "jcas_code"
     t.string   "ucas_code"
     t.string   "url_course"
     t.string   "url_financial_support"

@@ -5,7 +5,6 @@ class CreateCourses < ActiveRecord::Migration
 
       t.string :kis_course_id
       t.integer :institution_id
-      t.string :jcas_code
       t.string :ucas_code
 
       t.string :url_course
