@@ -7,6 +7,7 @@ class UnistatsCourse < ActiveRecord::Base
 	has_one :unistats_employment, :foreign_key => "parentId"
 	has_one :unistats_entry, :foreign_key => "parentId"
 	has_one :unistats_nss, :foreign_key => "parentId"
+	has_one :unistats_salary, :foreign_key => "parentId"
 
 	def self.import!
 
@@ -38,6 +39,7 @@ class UnistatsCourse < ActiveRecord::Base
 			employment = external_course.unistats_employment
 			entry = external_course.unistats_entry
 			nss = external_course.unistats_nss
+			salary =  external_course.unistats_salary
 
 			nss_teaching = ([:Q1, :Q2, :Q3, :Q4].map{|m| nss.send(m).to_i}._average) if nss
 			nss_feedback = ([:Q5, :Q6, :Q7, :Q8, :Q9].map{|m| nss.send(m).to_i}._average) if nss
@@ -46,6 +48,9 @@ class UnistatsCourse < ActiveRecord::Base
 			nss_personal_development = ([:Q19].map{|m| nss.send(m).to_i}._average) if nss
 
 			course.attributes = {
+				
+				:title => external_course.TITLE,
+
 				:institution_id => institution.id,
 				:ucas_code => external_course.UCASCOURSEID,
 				
@@ -86,10 +91,10 @@ class UnistatsCourse < ActiveRecord::Base
 				:nss_feedback => nss_feedback,
 				:nss_academic => nss_academic,
 				:nss_resources => nss_resources,
-				:nss_personal_development => nss_personal_development
+				:nss_personal_development => nss_personal_development,
 				
-				# :salary_subject_average => external_course.,
-				# :salary_course_average => tst
+				:salary_subject_average => salary.try(:LDMED).presence,
+				:salary_course_average => salary.try(:INSTMED).presence
 			}
 
 			course.save!
