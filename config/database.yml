@@ -2,15 +2,15 @@ development:
   database: uk_course_map_dev
   adapter: mysql2
   username: root
-  password: 
-  host: 127.0.0.1
+  password:
+  host: 192.168.126.67
   encoding: utf8
 
 unistats:
   database: UNISTATS
   adapter: mysql2
   username: root
-  password: 
-  host: 127.0.0.1
+  password:
+  host: 192.168.126.67
   encoding: utf8
-  
+
