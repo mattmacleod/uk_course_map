@@ -1,6 +1,18 @@
+body
+	color: #444
+
 #body_wrapper
 	width: 960px
 	margin: 0 auto
 
-h1
-	font-family: "museo_slab"
+#header
+	+padding-leader(1)
+	+padding-trailer(1)
+	font-family: "museo_slab", Helvetica
+	p
+		+adjust-font-size-to(24px)
+
+	h1
+		+adjust-font-size-to(48px,1.5)
+		span
+			color: #777
