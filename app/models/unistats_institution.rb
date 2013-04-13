@@ -22,6 +22,7 @@ class UnistatsInstitution < ActiveRecord::Base
 
       app_in.attributes = {
         :name               => ukprnmap[inst.UKPRN.to_s],
+        :unistats_id        => inst.recordId,
         :url_accommodation  => inst.ACCOMURL,
         :accommodation_cost => cost,
         :country            => country
