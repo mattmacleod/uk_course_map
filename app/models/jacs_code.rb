@@ -15,33 +15,43 @@ class JacsCode < ActiveRecord::Base
   end
 
   def job_weights
+
   	if is_category?
-  		#children.map { |c| c.weight_to( job ) }._average
+  		valid_children = children.map(&:job_weights).reject(&:blank?).reject{ |j| j.values.sum == 0}
+  		average_job_weight_hash valid_children, valid_children.count
   	else
-
-  		# Setup course variables
-  		courses_length = courses.count
-  		job_weights = {}
-
-  		# Extract the job weights from every course
-  		courses.map(&:job_weights).flatten.each do |jobweight|
-  			job    = jobweight.keys.first
-  			weight = jobweight.values.first
-
-  			job_weights[ job ] ||= []
-  			job_weights[ job ] << weight
-  		end
-
-  		# Averaging the weights over all courses
-  		averages = {}
-  		job_weights.each do |job,weights|
-  			padding_zeros = courses_length - weights.length
-  			averages[ job ] = (weights + [0]*padding_zeros)._average
-  		end
-
-  		return averages
-
+		average_job_weight_hash courses.map(&:job_weights), courses.count
   	end
+
+  end
+
+  private
+
+  def average_job_weight_hash( job_hash, total_length )
+
+	# Get the total weight for each job
+	total_weights = {}
+	job_hash.each do |job_weights|
+		job_weights.each do |job, weight|
+			total_weights[job] ||= []
+			total_weights[job] << weight
+		end
+	end
+
+	# Pad to total number of jobs
+	padded_weights = {}
+	total_weights.each do |job, weights|
+		padded_weights[job] = total_weights[job].fill( 0, total_weights[job].length, (total_length-total_weights[job].length) )
+	end
+
+	# Calculate average of all jobs!
+	average_weights = {}
+	padded_weights.each do |job, weights|
+		average_weights[job] = weights._average
+	end
+
+	average_weights
+
   end
 
 end

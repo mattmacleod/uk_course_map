@@ -6,7 +6,7 @@ class Course < ActiveRecord::Base
   has_and_belongs_to_many :jacs_codes
 
   def job_weights
-  	jobs.select([:percentage, "jobs.id"]).map { |j| {j.id => j.percentage} }
+  	Hash[jobs.select([:percentage, "jobs.id"]).map { |j| [j.id, j.percentage] }]
   end
 
 end
