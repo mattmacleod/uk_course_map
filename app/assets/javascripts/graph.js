@@ -7,7 +7,9 @@ ukcoursemap.graph = {
         padding = 1.5,
         diameter = Math.min(height, width) * 0.8,
         outerRadius = Math.min(height, width) * 0.45,
-        jobRadius = 15;
+        jobRadius = 15,
+        offsetLeft = (width - diameter) / 2,
+        offsetTop = (height - diameter) / 2;
 
     var jsonCourses;
 
@@ -56,8 +58,8 @@ ukcoursemap.graph = {
 
     var vis = svg.append("svg:g")
           .attr("transform",
-                "translate(" + (width - diameter) / 2 + "," +
-                (height - diameter) / 2 + ")");
+                "translate(" + offsetLeft + "," +
+                offsetTop + ")");
 
     var index = 0;
 
@@ -66,6 +68,12 @@ ukcoursemap.graph = {
       jsonCourses = data;
 
       var nodesData = pack.nodes(jsonCourses);
+
+      d3.selection.prototype.moveToFront = function() {
+        return this.each(function(){
+          this.parentNode.appendChild(this);
+        });
+      };
 
       vis.selectAll("circle")
         .data(nodesData)
@@ -97,20 +105,34 @@ ukcoursemap.graph = {
           return d.sub_categories ? zoomIn(d) : null;
         })
         .on("mouseover", function(d) {
+
+          if( d.id === undefined ){ return; }
+          
           $("div#info").text(d.name);
+          
           $("circle[parent=" + d.id + "]")
             .css("opacity", 1);
+          
           d3.json("/jobs.json?course=" + d.id, function(data) {
+
             var jobs = findTargets(data);
+            vis.selectAll("line").remove();
             vis.selectAll("line").data(jobs).enter()
               .append("svg:line")
               .attr("percent", function(d) { return d.percent; })
               .attr("x1", d.x)
               .attr("y1", d.y)
-              .attr("x2", function(d) { return d.targetX; })
-              .attr("y2", function(d) { return d.targetY; })
-              .style("stroke-width", function(d) { return d.percent; });
+              .attr("x2", function(d){ return d.targetX.baseVal.value - offsetLeft; } )
+              .attr("y2", function(d){ return d.targetY.baseVal.value - offsetTop; } )
+              .style("stroke", "rgb(255,255,255)")
+              .style("stroke-width", function(d) { 
+                return (d.percentage*d.percentage)/5; 
+              });
+
+              // d3.select(d).moveToFront();
+
           });
+
         })
         .on("mouseout", function(d) {
           $("div#info").text("");
@@ -122,7 +144,7 @@ ukcoursemap.graph = {
 
     function findTargets(arr) {
       for (var elem in arr) {
-        var target = $("circle#" + arr[elem].target).get(0);
+        var target = $("#" + arr[elem].id).get(0);
         arr[elem].targetX = target.cx;
         arr[elem].targetY = target.cy;
       }
@@ -162,17 +184,18 @@ ukcoursemap.graph = {
             top: $(elm).offset().top,
             left: $(elm).offset().left+50
           });
-          d3.json("/courses.json?job=" + d.id, function(data) {
-            var jobs = findTargets(data);
-            vis.selectAll("line").data(jobs).enter()
-              .append("svg:line")
-              .attr("percent", function(d) { return d.percent; })
-              .attr("x1", d.x)
-              .attr("y1", d.y)
-              .attr("x2", function(d) { return d.targetX; })
-              .attr("y2", function(d) { return d.targetY; })
-              .style("stroke-width", function(d) { return d.percent; });
-          });
+          // d3.json("/courses.json?job=" + d.id, function(data) {
+          //   var jobs = findTargets(data);
+          //   console.log(jobs)
+          //   vis.selectAll("line").data(jobs).enter()
+          //     .append("svg:line")
+          //     .attr("percent", function(d) { return d.percent; })
+          //     .attr("x1", d.x)
+          //     .attr("y1", d.y)
+          //     .attr("x2", function(d) { return d.targetX; })
+          //     .attr("y2", function(d) { return d.targetY; })
+          //     .style("stroke-width", function(d) { return d.percent; });
+          // });
         })
         .on("mouseout", function(d) {
           $("div#info").text("").addClass("hidden");
@@ -247,16 +270,20 @@ ukcoursemap.graph = {
   },
 
   filter: function(ids) {
-    console.log("Hiding")
-    console.log(ids)
     d3.select("#graph svg").selectAll("circle")
       .filter(function(d) {
         return $.inArray(d3.select(this).attr("id"), ids) >= 0;
       })
       .transition()
       .duration(800)
-      .style("opacity", 0)
-      .style("visibility", "hidden");
+      .style("opacity", 0.25);
+
+    d3.select("#graph svg").selectAll("circle")
+      .filter(function(d) {
+        return $.inArray(d3.select(this).attr("id"), ids) < 0;
+      })
+      .transition()
+      .style("fill", "rgba(193,39,45)");
   }
 
 };
