@@ -13,6 +13,7 @@ ukcoursemap.search = {
 				data: $("#search_form").serialize(),
 				success: function(data){
 					$("#search_spinner").fadeOut(function(){ $(this).remove(); });
+					console.log(data);
 				}
 			});
 			return false;

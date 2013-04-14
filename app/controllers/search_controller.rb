@@ -79,22 +79,26 @@ class SearchController < ApplicationController
         matching_jobs = Job.tagged_with( params[:job_tags] ).map(&:id)
 
         matching_courses = Course.scoped
-        matching_courses = matching_courses.where("institution.country" => params[:country]) if params[:country]
-        matching_courses = matching_courses.where("MOD(courses.id)==2") if params[:priorities] && params[:priorities][:study]
-        matching_courses = matching_courses.where("MOD(courses.id)==3") if params[:priorities] && params[:priorities][:work]
-        matching_courses = matching_courses.where("MOD(courses.id)==4") if params[:priorities] && params[:priorities][:parttime]
-        matching_courses = matching_courses.where("MOD(courses.id)==5") if params[:priorities] && params[:priorities][:cost]
-        matching_courses = matching_courses.where("MOD(courses.id)==6") if params[:priorities] && params[:priorities][:salary]
+        matching_courses = matching_courses.joins(:institution).where(:"institutions.country" => params[:country]) if params[:country].present?
+        matching_courses = matching_courses.having("(courses.id%2)=1") if params[:priorities] && params[:priorities][:study]
+        matching_courses = matching_courses.having("(courses.id%3)=1") if params[:priorities] && params[:priorities][:work]
+        matching_courses = matching_courses.having("(courses.id%4)=1") if params[:priorities] && params[:priorities][:parttime]
+        matching_courses = matching_courses.having("(courses.id%5)=1") if params[:priorities] && params[:priorities][:cost]
+        matching_courses = matching_courses.having("(courses.id%6)=1") if params[:priorities] && params[:priorities][:salary]
 
-        matching_categories = matching_courses.map(&:jacscode).uniq.map(&:id)
-        matching_sub_categories = matching_courses.map(&:jacscode).uniq.map(&:id)
+        matching_categories = matching_courses.includes(:jacs_codes).map(&:jacs_codes).flatten.uniq.map(&:id)
 
         # Find items to hide
         jobs_to_hide = all_jobs - matching_jobs
         courses_to_hide = all_courses - matching_courses.map(&:id)
-        cat
-        render :json => {
+        categories_to_hide = all_categories - matching_categories
+        sub_categories_to_hide = all_sub_categories - matching_categories
 
+        render :json => {
+            :jobs_to_hide => jobs_to_hide,
+            :courses_to_hide => courses_to_hide,
+            :categories_to_hide => categories_to_hide,
+            :sub_categories_to_hide => sub_categories_to_hide
         }
 
     end
