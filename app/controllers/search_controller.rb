@@ -27,10 +27,10 @@ class SearchController < ApplicationController
 
     def level1
     	output = {}
-    	
+
     	jobs = Job.all
     	categories = JacsCode.categories
-    	
+
     	output[:categories] = categories.map {|c| {:category => c, :weights => c.job_weights } }
 		output[:jobs] = jobs
 
@@ -42,13 +42,13 @@ class SearchController < ApplicationController
     	output = { :size => (10000..30000).to_a.sample }
     	categories = JacsCode.categories
         output[:categories] = []
-    	
+
         categories.each do |category|
     		output[:categories] << {
                 :id => category.id,
     			:name => category.title,
     			:size => (10000..30000).to_a.sample,
-    			:sub_categories => category.children.map{ |child| 
+    			:sub_categories => category.children.map{ |child|
     				{
                         :id => child.id,
     					:name => child.title,
@@ -59,11 +59,16 @@ class SearchController < ApplicationController
     	end
 
     	render :json => output
-        
+
     end
 
     def jobs
-        render :json => Job.all.to_json(:only => [:title, :id])
+        if params[:course]
+            job = Course.find(params[:course]).jobs
+            render :json => job.to_json(:only => [:title, :id])
+        else
+            render :json => Job.all.to_json(:only => [:title, :id])
+        end
     end
 
     # Simple search. Returns a lit of object IDs to be excluded from the graph.
