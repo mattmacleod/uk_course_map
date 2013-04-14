@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130413120218) do
+ActiveRecord::Schema.define(:version => 20130414022315) do
 
   create_table "course_jobs", :force => true do |t|
     t.integer  "course_id"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(:version => 20130413120218) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  add_index "course_jobs", ["course_id", "job_id"], :name => "course_id"
 
   create_table "courses", :force => true do |t|
     t.string   "title"
@@ -63,6 +65,11 @@ ActiveRecord::Schema.define(:version => 20130413120218) do
     t.datetime "updated_at",                 :null => false
   end
 
+  create_table "courses_jacs_codes", :force => true do |t|
+    t.integer "jacs_code_id"
+    t.integer "course_id"
+  end
+
   create_table "institutions", :force => true do |t|
     t.string   "name"
     t.string   "unistats_id"
@@ -74,10 +81,29 @@ ActiveRecord::Schema.define(:version => 20130413120218) do
     t.datetime "updated_at",         :null => false
   end
 
+  create_table "jacs_codes", :force => true do |t|
+    t.string  "jacs_code",   :limit => 50,  :default => "", :null => false
+    t.string  "title",       :limit => 256
+    t.text    "description"
+    t.integer "parent_id"
+  end
+
+  add_index "jacs_codes", ["id"], :name => "id", :unique => true
+
+  create_table "job_tags", :force => true do |t|
+    t.integer "job_id"
+    t.string  "tag"
+  end
+
   create_table "jobs", :force => true do |t|
     t.string   "title"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "tags", :id => false, :force => true do |t|
+    t.string "JOB"
+    t.string "TAG"
   end
 
 end
