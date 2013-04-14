@@ -29,16 +29,27 @@ var vis = d3.select("body").insert("svg:svg")
       "translate(" + (width - diameter) / 2 + "," +
         (height - diameter) / 2 + ")");
 
-//for (var i = 0; i < width; i = i + 20) {
-//    x1 = i;
-//    x2 = x1 + 10;
-//    vis.append("svg:line")
-//    .attr("x1", x1)
-//    .attr("x2", x2)
-//    .attr("y1", 0)
-//    .attr("y2", height)
-//    .style("stroke", "rgb(212,212,212)");
-//}
+for (var i = 0; i < width; i = i + 20) {
+    x1 = i;
+    x2 = x1 + 10;
+    vis.append("svg:line")
+    .attr("x1", x1)
+    .attr("x2", x2)
+    .attr("y1", 0)
+    .attr("y2", height)
+    .style("stroke", "rgb(212,212,212)");
+}
+
+for (var i = 0; i < height; i = i + 20) {
+    y1 = i;
+    y2 = y1 + 10;
+    vis.append("svg:line")
+    .attr("x1", 0)
+    .attr("x2", width)
+    .attr("y1", y1)
+    .attr("y2", y2)
+    .style("stroke", "rgb(212,212,212)");
+}
 
 // -- Add courses --
 
