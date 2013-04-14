@@ -1,0 +1,41 @@
+#lightbox_overlay
+	background: rgba(0,0,0,0.5)
+	position: fixed
+	top: 0
+	left: 0
+	right: 0
+	bottom: 0
+	z-index: 100
+
+#lightbox_content
+	z-index: 101
+	width: 100%
+	height: 100%
+	text-align: center
+	display: table
+
+#lightbox_inner
+	display: table-cell
+	vertical-align: middle
+
+#lightbox_iframe
+	width: 100%
+	height: 500px
+
+#lightbox_overlay
+	+transition(all 333ms ease-in-out)
+	+opacity(1)
+	#lightbox_content
+		+transition(all 333ms ease-in-out)
+		+transform( translate(0,0) rotate(0) )
+		+opacity(1)
+	&.hidden_in
+		+opacity(0)
+		#lightbox_content
+			+transform( translate(0,400px) )
+			+opacity(0)
+	&.hidden_out
+		+opacity(0)
+		#lightbox_content
+			+transform( translate(0,-400px) )
+			+opacity(0)

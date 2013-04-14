@@ -4,6 +4,7 @@ var ukcoursemap = {
 		init: function(){
 			ukcoursemap.graph.setup();
 			ukcoursemap.search.setup();
+			ukcoursemap.lightbox.setup();
 		}
 };
 
