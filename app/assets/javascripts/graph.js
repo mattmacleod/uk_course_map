@@ -4,7 +4,7 @@ ukcoursemap.graph = {
 
 
     var width = $("#graph").width(),
-        height = $("#height").width(),
+        height = $("#graph").height(),
         padding = 1.5,
         diameter = Math.min(height, width) * 0.8,
         outerRadius = Math.min(height, width) * 0.45,
@@ -26,26 +26,39 @@ ukcoursemap.graph = {
 
     // -- Add SVG --
 
-    var vis = d3.select("body").insert("svg:svg")
+    var vis = d3.select("#graph").insert("svg:svg")
         .attr("width", width)
         .attr("height", height)
-      .append("svg:g")
-        .attr("transform",
-          "translate(" + (width - diameter) / 2 + "," +
-            (height - diameter) / 2 + ")");
+        .append("svg:g")
+          .attr("transform",
+            "translate(" + (width - diameter) / 2 + "," +
+              (height - diameter) / 2 + ")");
 
-    //for (var i = 0; i < width; i = i + 20) {
-    //    x1 = i;
-    //    x2 = x1 + 10;
-    //    vis.append("svg:line")
-    //    .attr("x1", x1)
-    //    .attr("x2", x2)
-    //    .attr("y1", 0)
-    //    .attr("y2", height)
-    //    .style("stroke", "rgb(212,212,212)");
-    //}
+for (var i = 0; i < width-400; i = i + 20) {
+    x1 = i;
+    x2 = x1 + 10;
+    vis.append("svg:line")
+    .attr("x1", x1)
+    .attr("x2", x2)
+    .attr("y1", 0)
+    .attr("y2", height)
+    .style("stroke", "rgb(212,212,212)");
+}
+
+for (var i = 0; i < height; i = i + 20) {
+    y1 = i;
+    y2 = y1 + 10;
+    vis.append("svg:line")
+    .attr("x1", 0)
+    .attr("x2", width-400)
+    .attr("y1", y1)
+    .attr("y2", y2)
+    .style("stroke", "rgb(212,212,212)");
+}
 
     // -- Add courses --
+
+    var index = 0;
 
     d3.json("/all_data.json", function(data) {
 
@@ -58,7 +71,12 @@ ukcoursemap.graph = {
         .enter().append("svg:circle")
           .attr("id", function(d) { return d.id; })
           .attr("class", function(d) {
-            return d.sub_categories ? "category" : "sub_category";
+            var classname = d.sub_categories ? "category" : "sub_category";
+            if( d.sub_categories ){
+              return classname + " gradient_" + index++;
+            } else {
+              return classname;
+            }
           })
           .attr("cx", function(d) { return d.x; })
           .attr("cy", function(d) { return d.y; })
@@ -87,7 +105,7 @@ ukcoursemap.graph = {
 
     // -- Add jobs --
 
-    var vis2 = d3.select("svg").append("svg:g");
+    var vis2 = d3.select("#graph svg").append("svg:g");
 
     d3.json("/jobs.json", function(data) {
 
