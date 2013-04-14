@@ -7,5 +7,6 @@ UkCourseMap::Application.routes.draw do
 
   get "all_data.json" => "search#all_data"
   get "jobs.json"     => "search#jobs"
+  get "filter_results.json" => "search#filter_results"
 
 end

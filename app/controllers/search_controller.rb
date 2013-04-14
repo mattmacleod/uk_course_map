@@ -66,4 +66,27 @@ class SearchController < ApplicationController
         render :json => Job.all.to_json(:only => [:title, :id])
     end
 
+    # Simple search. Returns a lit of object IDs to be excluded from the graph.
+    def filter_results
+
+        # first, get all objects.
+        all_jobs = Job.select(:id).all.map(&:id)
+        all_categories = JacsCode.categories.select(:id).all.map(&:id)
+        all_sub_categories = JacsCode.select(:id).all.map(&:id) - all_categories
+        all_courses = Course.select(:id).all.map(&:id)
+
+        # Find matching items
+        matching_jobs = Job.tagged_with( params[:job_tags] ).map(&:id)
+
+        matching_courses = Course.scoped
+        # if params[]
+        # end
+
+
+        render :json => {
+
+        }
+
+    end
+
 end
