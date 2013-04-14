@@ -45,21 +45,25 @@ ukcoursemap.graph = {
       var nodes = pack.nodes(root);
       console.log(root);
 
+      var index = 0;
+
       vis.selectAll("circle")
-          .data(nodes)
+        .data(nodes)
         .enter().append("svg:circle")
-          .attr("class", function(d) {
-            return d.children ? "parent" : "child";
-          })
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; })
-          .attr("r", function(d) { return d.r; })
-          .style("opacity", function(d) {
-            return d.parent == null ? 0 : 1;
-          })
-          .on("click", function(d) {
-            return zoom(node == d ? root : d);
-          });
+        .attr("id", function(d) { return d.name; })
+        .attr("class", function(d) {
+          var classname = d.sub_categories ? "category" : "sub_category";
+          return classname + " gradient_" + index++;
+        })
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", function(d) { return d.r; })
+        .style("opacity", function(d) {
+          return d.parent == null ? 0 : 1;
+        })
+        .on("click", function(d) {
+          return zoom(node == d ? root : d);
+        });
 
       // vis.selectAll("text")
       //     .data(nodes)
