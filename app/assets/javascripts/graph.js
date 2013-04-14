@@ -2,7 +2,6 @@ ukcoursemap.graph = {
 
   setup: function(){
 
-
     var width = $("#graph").width(),
         height = $("#graph").height(),
         padding = 1.5,
@@ -23,22 +22,22 @@ ukcoursemap.graph = {
 
     // -- Add SVG --
 
-    var svg = d3.select("body").insert("svg:svg")
+    var svg = d3.select("#graph").insert("svg:svg")
           .attr("width", width)
           .attr("height", height);
 
 
     // -- Add grid --
 
-    var gridWidth = width - 400,
+    var gridWidth = width-50,
         gridHeight = height,
         gridLines = [];
 
-    for (var i = 0; i < width; i = i + 20) {
+    for (var i = 0; i < gridWidth; i = i + 20) {
       gridLines.push({"x1": i, "x2": i, "y1": 0, "y2": gridHeight});
     }
 
-    for (var i = 0; i < height; i = i + 20) {
+    for (var i = 0; i < gridHeight; i = i + 20) {
       gridLines.push({"x1": 0, "x2": gridWidth, "y1": i, "y2": i});
     }
 
@@ -151,14 +150,18 @@ ukcoursemap.graph = {
         .data(jobs)
         .enter()
         .append("svg:circle")
-        .attr("id", function(d) { return d.id; })
+        .attr("id", function(d) { return ("job_" + d.id); })
         .attr("title", function(d) { return d.title; })
         .attr("class", "job")
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
         .attr("r", function(d) { return d.r; })
         .on("mouseover", function(d) {
-          $("div#info").text(d.title);
+          var elm = d3.select(this)[0];
+          $("div#info").removeClass("hidden").text(d.title).css({
+            top: $(elm).offset().top,
+            left: $(elm).offset().left+50
+          });
           d3.json("/courses.json?job=" + d.id, function(data) {
             var jobs = findTargets(data);
             vis.selectAll("line").data(jobs).enter()
@@ -172,7 +175,7 @@ ukcoursemap.graph = {
           });
         })
         .on("mouseout", function(d) {
-          $("div#info").text("");
+          $("div#info").text("").addClass("hidden");
           vis.selectAll("line").remove();
         });
     });
@@ -241,18 +244,19 @@ ukcoursemap.graph = {
       // d3.select(window).on("click", null);
     }
 
-    function filter(ids) {
-      d3.select("svg").selectAll("circle")
-        .filter(function(d) {
-          return $.inArray(d.id, ids) < 0;
-        })
-        .transition()
-        .duration(800)
-        .style("opacity", 0)
-        .style("visibility", "hidden")
-        .on("click", null)
-        .on("mouseover", null)
-        .on("mouseout", null);
-    }
+  },
+
+  filter: function(ids) {
+    console.log("Hiding")
+    console.log(ids)
+    d3.select("#graph svg").selectAll("circle")
+      .filter(function(d) {
+        return $.inArray(d3.select(this).attr("id"), ids) >= 0;
+      })
+      .transition()
+      .duration(800)
+      .style("opacity", 0)
+      .style("visibility", "hidden");
   }
+
 };
