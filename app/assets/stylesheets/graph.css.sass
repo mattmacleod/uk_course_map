@@ -31,3 +31,7 @@ svg
   circle.child
     pointer-events: none
 
+  @for $i from 1 to 19
+    circle.gradient_#{$i}
+      fill: url(#gradient_#{$i})
+

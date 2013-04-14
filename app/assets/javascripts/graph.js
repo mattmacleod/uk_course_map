@@ -53,7 +53,11 @@ ukcoursemap.graph = {
         .attr("id", function(d) { return d.name; })
         .attr("class", function(d) {
           var classname = d.sub_categories ? "category" : "sub_category";
-          return classname + " gradient_" + index++;
+          if( d.sub_categories ){
+            return classname + " gradient_" + index++;
+          } else {
+            return classname;
+          }
         })
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
