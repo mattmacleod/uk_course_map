@@ -69,7 +69,10 @@ for (var i = 0; i < height; i = i + 20) {
       vis.selectAll("circle")
         .data(nodes)
         .enter().append("svg:circle")
-          .attr("id", function(d) { return d.id; })
+          .attr("id", function(d) {
+            var type = d.sub_categories ? "category" : "sub_category";
+            return type + "_" + d.id;
+          })
           .attr("class", function(d) {
             var classname = d.sub_categories ? "category" : "sub_category";
             if( d.sub_categories ){
@@ -123,7 +126,7 @@ for (var i = 0; i < height; i = i + 20) {
 
       vis2.selectAll("circle").data(jobs)
         .enter().append("svg:circle")
-          .attr("id", function(d) { return d.id; })
+          .attr("id", function(d) { return "jobs_" + d.id; })
           .attr("title", function(d) { return d.title; })
           .attr("class", "job")
           .attr("cx", function(d) { return d.x; })
