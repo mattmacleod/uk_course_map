@@ -13,12 +13,3 @@
 //= require jquery
 //= require jquery_ujs
 //= require_tree .
-
-$.ajax({
-	type: "GET",
-	url: url,
-	dataType: "JSON",
-	success: function( data ){
-		
-	}
-});

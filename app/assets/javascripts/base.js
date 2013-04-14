@@ -2,7 +2,6 @@
 var ukcoursemap = {
 
 		init: function(){
-			this.graph.setup();
 		}
 };
 
