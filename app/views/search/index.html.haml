@@ -2,7 +2,42 @@
 	%h1 UK<span>Course</span>Map
 	%p Find Your Future, Fast
 
+#search
+	%form#search_form
+		%h2 Tell us about your interests
+		.field
+			.note e.g. music, hairdressing, art...
+			%input{ :type => :text, :name => :job_tags }
 
+		%h2 Where would you like to study?
+		.field
+			= select_tag :country, options_for_select([["--Anywhere--", ''], "Scotland", "England", "Wales", "Northern Ireland"])
+
+		%h2 What is important to you?
+		%br/
+		.field.option
+			%label 
+				Opportunities for further study
+				= check_box_tag "priorities[study]"
+		.field.option
+			%label
+				Finding work after graduation
+				= check_box_tag "priorities[work]"
+		.field.option
+			%label 
+				Studying part-time
+				= check_box_tag "priorities[parttime]"
+		.field.option
+			%label 
+				Fees and accommodation costs
+				= check_box_tag "priorities[cost]"
+		.field.option
+			%label 
+				Salary
+				= check_box_tag "priorities[salary]"		
+
+		.field.button
+			= link_to "Show me my future", "#", :id => :search_button
 #body
 	
 #svg_gradients

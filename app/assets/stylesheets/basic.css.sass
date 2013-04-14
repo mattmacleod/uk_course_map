@@ -1,8 +1,59 @@
+*
+	+box-sizing(border-box)
+
 body
 	color: #444
-	background: radial-gradient(rgb(235,235,235), rgb(212,212,212) 100%)
+	+background(radial-gradient(rgb(235,235,235), rgb(212,212,212) 100%))
+	font-family: "museo_slab", Helvetica
 
 #body_wrapper
+
+#search
+	position: absolute
+	top: 150px
+	right: 0
+	bottom: 0
+	width: 300px
+	padding-right: 20px
+	padding-bottom: 20px
+	text-align: right
+	.field
+		margin-bottom: 20px
+		&.option
+			margin-bottom: 5px
+	.note
+		color: #888
+		+adjust-font-size-to(12px,1)
+	label
+		color: #666
+		+adjust-font-size-to(14px,1)
+	select
+		width: 100%
+		padding: 5px
+		height: 2em
+		background: white
+		+leader(0.25)
+		text-align: right
+
+	#search_button
+		background: #63f
+		color: white
+		+adjust-font-size-to(14px, 1.2)
+		display: block
+		float: right
+		text-decoration: none
+		padding: 0 5px
+		+leader(1)
+
+	input[type=text]
+		+transition(all 200ms ease-in-out)
+		padding: 10px
+		margin-top: 5px
+		border: 1px transparent solid
+		width: 90%
+		&:focus
+			outline: none
+			border: 1px #63f solid
 
 
 #header
@@ -10,7 +61,6 @@ body
 	+padding-trailer(1)
 	padding-right: rhythm(1)
 	text-align: right
-	font-family: "museo_slab", Helvetica
 	p
 		+adjust-font-size-to(24px)
 
