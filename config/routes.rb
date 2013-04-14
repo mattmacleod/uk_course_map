@@ -2,10 +2,11 @@ UkCourseMap::Application.routes.draw do
 
   root :to => "search#index"
 
-  get "jobs/:id/courses.json" => "search#getcoursesfromjob"
-  get "jacs/:jacs_code/courses.json" => "search#getcoursesfromjac"
-  get "courses.json"          => "search#getcourses"
+  get "courses.json" => "search#getcourses"
 
   get "level1" => "search#level1"
+
+  get "all_data.json" => "search#all_data"
+  get "jobs.json" => "search#jobs"
 
 end
