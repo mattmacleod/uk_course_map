@@ -2,8 +2,10 @@ ukcoursemap.graph = {
 
   setup: function(){
 
-    var width = window.innerWidth * 0.99,
-        height = window.innerHeight * 0.97,
+    var $graph = $("#graph");
+
+    var width = $graph.width(),
+        height = $graph.height(),
         radius = Math.min(height, width) * 0.8;
         padding = 10;
 
@@ -23,7 +25,7 @@ ukcoursemap.graph = {
             return d.sub_categories;
         });
 
-    var vis = d3.select("#body").insert("svg:svg")
+    var vis = d3.select("#graph").insert("svg:svg")
         .attr("width", width)
         .attr("height", height)
       .append("svg:g")
