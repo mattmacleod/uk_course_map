@@ -17,18 +17,18 @@ class SearchController < ApplicationController
 
     def all_data
 
-    	output = { :size => 26000 }
+    	output = { :size => (10000..30000).to_a.sample }
     	categories = JacsCode.categories
         output[:categories] = []
     	
         categories.each do |category|
     		output[:categories] << {
     			:name => category.title,
-    			:size => 18000,
+    			:size => (10000..30000).to_a.sample,
     			:sub_categories => category.children.map{ |child| 
     				{
     					:name => child.title,
-    					:size => 10000
+    					:size => (10000..30000).to_a.sample
     				}
     			}
     		}
