@@ -109,7 +109,6 @@ ukcoursemap.graph = {
           return d.sub_categories ? zoomIn(d) : null;
         })
         .on("mouseover", function(d) {
-
           if( d.id === undefined ){ return; }
           
           $("div#info2").text(d.name);
@@ -250,11 +249,13 @@ ukcoursemap.graph = {
       vis.selectAll("circle")
         .on("click", zoomOut) // FIXME: Should open pop-up
         .on("mouseover", function(d) {
-          $("div#info").text(d.name);
+          $("div#info2").text(d.name);
         })
         .on("mouseout", function(d) {
-          $("div#info").text("");
+          $("div#info2").text("");
         });
+
+        $(".sub_category").click(function(e){ alert("hello"); e.preventDefault();})
 
       // FIXME
       // $("body").on("click", function() { return zoomOut(); });
