@@ -65,9 +65,33 @@ class SearchController < ApplicationController
     def jobs
         if params[:course]
             job = Course.find(params[:course]).jobs
-            render :json => job.to_json(:only => [:title, :id])
+            render :json => job.to_json(:only => [:id, :percent])
         else
             render :json => Job.all.to_json(:only => [:title, :id])
+        end
+    end
+
+    def getcourses
+        if params[:job]
+            result = []
+
+            cjobs = Job.find(params[:job]).course_jobs
+            cjobs.each do |j|
+                if j[:course_id] && j[:course_id] > 0
+                    jacs = Course.find(j[:course_id]).jacs_codes.find {|jac| jac[:parent_id] > 0}
+                    if jacs
+                        result.push({
+                            :target    => jacs[:id],
+                            #:jacs_code => jacs[:jacs_code],
+                            :percent   => j[:percentage]
+                        })
+                    end
+                end
+            end
+
+            render :json => result.to_json
+        else
+            render :json => Course.all.to_json
         end
     end
 
