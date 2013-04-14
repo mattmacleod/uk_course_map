@@ -68,10 +68,10 @@ class SearchController < ApplicationController
             weights = JacsCode.find( params[:course] ).job_weights
             output = []
             show_above = weights.values.sort.reverse[0..4].min
-
             weights.each do |w|
                 next unless w[1] >= show_above
-                output << {:id => "job_#{ w[0]}", :percentage => w[1]}
+                job = Job.find(w[1])
+                output << {:id => "job_#{ w[0]}", :percentage => w[1], :title => job.title}
             end
             render :json => output
         else
@@ -91,7 +91,7 @@ class SearchController < ApplicationController
                     jacs = courses[j[:course_id]].jacs_codes.find {|jac| jac[:parent_id] > 0}
                     if jacs
                         result.push({
-                            :id    => jacs[:id],
+                            :id           => jacs[:id],
                             :percentage   => j[:percentage]
                         })
                     end

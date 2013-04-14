@@ -50,6 +50,7 @@
 				%stop{:style => "stop-color: rgb(#{stop})", :offset => "100%"}
 
 #info.hidden
+#info2.hidden
 
-#graph
+#graph{ :data => { :colours => SearchController::Gradients.map{|c| c[0] } } }
 	

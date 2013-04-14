@@ -101,6 +101,10 @@ ukcoursemap.graph = {
         .style("opacity", function(d) {
           return d.sub_categories ? 1 : 0;
         })
+        .style("fill", function(d){
+          if( d.sub_categories || !d.parent ){ return; }
+          return "rgb(193,39,45)";
+        })
         .on("click", function(d) {
           return d.sub_categories ? zoomIn(d) : null;
         })
@@ -108,14 +112,15 @@ ukcoursemap.graph = {
 
           if( d.id === undefined ){ return; }
           
-          $("div#info").text(d.name);
-          
+          $("div#info2").text(d.name);
+
           $("circle[parent=" + d.id + "]")
             .css("opacity", 1);
           
           d3.json("/jobs.json?course=" + d.id, function(data) {
 
             var jobs = findTargets(data);
+
             vis.selectAll("line").remove();
             vis.selectAll("line").data(jobs).enter()
               .append("svg:line")
@@ -129,7 +134,24 @@ ukcoursemap.graph = {
                 return (d.percentage*d.percentage)/5; 
               });
 
+              $.each(jobs, function(idx,elm){
+                $info_tip = $("<div class='job_info'/>");
+                $info_tip.text(elm.title).css({
+                  top: elm.targetY.baseVal.value - offsetTop + 50,
+                  left: elm.targetX.baseVal.value + offsetLeft - 180
+                });
+                $("#graph").before($info_tip);
+              })
+
               // d3.select(d).moveToFront();
+              // jobs.push(d)
+              // console.log(jobs)
+              // d3.select("#graph svg").selectAll("circle:not(.sub_category)")
+              // .filter(function(d) {
+              //   console.log(d)
+              //   return $.inArray(jobs, d) < 0;
+              // })
+              // .style("opacity", 0.25);
 
           });
 
@@ -139,6 +161,7 @@ ukcoursemap.graph = {
           $("circle[parent=" + d.id + "]")
             .css("opacity", 0);
           vis.selectAll("line").remove();
+          $(".job_info").remove();
         });
     });
 
@@ -212,7 +235,8 @@ ukcoursemap.graph = {
       var k = diameter / node.r / 2;
       x.domain([node.x - node.r, node.x + node.r]);
       y.domain([node.y - node.r, node.y + node.r]);
-
+      vis.selectAll("line").remove();
+      $(".job_info").remove();
       vis.selectAll("circle")
         .transition()
         .duration(1000)
@@ -277,13 +301,6 @@ ukcoursemap.graph = {
       .transition()
       .duration(800)
       .style("opacity", 0.25);
-
-    d3.select("#graph svg").selectAll("circle")
-      .filter(function(d) {
-        return $.inArray(d3.select(this).attr("id"), ids) < 0;
-      })
-      .transition()
-      .style("fill", "rgba(193,39,45)");
   }
 
 };
