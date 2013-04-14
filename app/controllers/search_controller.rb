@@ -79,10 +79,20 @@ class SearchController < ApplicationController
         matching_jobs = Job.tagged_with( params[:job_tags] ).map(&:id)
 
         matching_courses = Course.scoped
-        # if params[]
-        # end
+        matching_courses = matching_courses.where("institution.country" => params[:country]) if params[:country]
+        matching_courses = matching_courses.where("MOD(courses.id)==2") if params[:priorities] && params[:priorities][:study]
+        matching_courses = matching_courses.where("MOD(courses.id)==3") if params[:priorities] && params[:priorities][:work]
+        matching_courses = matching_courses.where("MOD(courses.id)==4") if params[:priorities] && params[:priorities][:parttime]
+        matching_courses = matching_courses.where("MOD(courses.id)==5") if params[:priorities] && params[:priorities][:cost]
+        matching_courses = matching_courses.where("MOD(courses.id)==6") if params[:priorities] && params[:priorities][:salary]
 
+        matching_categories = matching_courses.map(&:jacscode).uniq.map(&:id)
+        matching_sub_categories = matching_courses.map(&:jacscode).uniq.map(&:id)
 
+        # Find items to hide
+        jobs_to_hide = all_jobs - matching_jobs
+        courses_to_hide = all_courses - matching_courses.map(&:id)
+        cat
         render :json => {
 
         }
