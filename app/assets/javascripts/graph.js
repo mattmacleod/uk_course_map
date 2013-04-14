@@ -10,105 +10,128 @@ ukcoursemap.graph = {
         outerRadius = Math.min(height, width) * 0.45,
         jobRadius = 15;
 
-    var node, root;
+    var jsonCourses;
 
     var pack = d3.layout.pack()
-        .size([diameter, diameter])
-        .value(function(d) { return d.size; })
-        .padding(padding)
-        .children(function(d) {
-          if (d.categories != null)
-            return d.categories;
-          else
-            return d.sub_categories;
-        });
+          .size([diameter, diameter])
+          .value(function(d) { return d.size; })
+          .padding(padding)
+          .children(function(d) {
+            return d.categories ? d.categories : d.sub_categories;
+          });
 
 
     // -- Add SVG --
 
-    var vis = d3.select("#graph").insert("svg:svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("svg:g")
-          .attr("transform",
-            "translate(" + (width - diameter) / 2 + "," +
-              (height - diameter) / 2 + ")");
+    var svg = d3.select("body").insert("svg:svg")
+          .attr("width", width)
+          .attr("height", height);
 
-for (var i = 0; i < width-400; i = i + 20) {
-    x1 = i;
-    x2 = x1 + 10;
-    vis.append("svg:line")
-    .attr("x1", x1)
-    .attr("x2", x2)
-    .attr("y1", 0)
-    .attr("y2", height)
-    .style("stroke", "rgb(212,212,212)");
-}
 
-for (var i = 0; i < height; i = i + 20) {
-    y1 = i;
-    y2 = y1 + 10;
-    vis.append("svg:line")
-    .attr("x1", 0)
-    .attr("x2", width-400)
-    .attr("y1", y1)
-    .attr("y2", y2)
-    .style("stroke", "rgb(212,212,212)");
-}
+    // -- Add grid --
+
+    var gridWidth = width - 400,
+        gridHeight = height,
+        gridLines = [];
+
+    for (var i = 0; i < width; i = i + 20) {
+      gridLines.push({"x1": i, "x2": i, "y1": 0, "y2": gridHeight});
+    }
+
+    for (var i = 0; i < height; i = i + 20) {
+      gridLines.push({"x1": 0, "x2": gridWidth, "y1": i, "y2": i});
+    }
+
+    svg.append("svg:g")
+      .selectAll("line")
+      .data(gridLines)
+      .enter().append("svg:line")
+      .attr("x1", function(d) { return d.x1; })
+      .attr("y1", function(d) { return d.y1; })
+      .attr("x2", function(d) { return d.x2; })
+      .attr("y2", function(d) { return d.y2; })
+      .style("stroke", "rgb(212,212,212)");
+
 
     // -- Add courses --
+
+    var vis = svg.append("svg:g")
+          .attr("transform",
+                "translate(" + (width - diameter) / 2 + "," +
+                (height - diameter) / 2 + ")");
 
     var index = 0;
 
     d3.json("/all_data.json", function(data) {
 
-      node = root = data;
+      jsonCourses = data;
 
-      var nodes = pack.nodes(root);
+      var nodesData = pack.nodes(jsonCourses);
 
       vis.selectAll("circle")
-        .data(nodes)
+        .data(nodesData)
         .enter().append("svg:circle")
-          .attr("id", function(d) {
-            var type = d.sub_categories ? "category" : "sub_category";
-            return type + "_" + d.id;
-          })
-          .attr("class", function(d) {
-            var classname = d.sub_categories ? "category" : "sub_category";
-            if( d.sub_categories ){
-              return classname + " gradient_" + index++;
-            } else {
-              return classname;
-            }
-          })
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; })
-          .attr("r", function(d) { return d.r; })
-          .attr("parent", function(d) {
-            return d.parent? d.parent.id : null;
-          })
-          .style("opacity", function(d) {
-            return d.sub_categories ? 1 : 0;
-          })
-          .on("click", function(d) {
-            return zoom(node == d ? root : d);
-          })
-          .on("mouseover", function(d) {
-            $("circle[parent=" + d.id + "]")
-              .css("opacity", 1);
-          })
-          .on("mouseout", function(d) {
-            $("circle[parent=" + d.id + "]")
-              .css("opacity", 0);
+        .attr("id", function(d) {
+          var type = d.sub_categories ? "category" : "sub_category";
+          return type + "_" + d.id;
+        })
+        .attr("class", function(d) {
+          var classname = d.sub_categories ? "category" : "sub_category";
+          if( d.sub_categories ){
+            return classname + " gradient_" + index++;
+          } else if (d.parent) {
+            return classname;
+          } else {
+            return "root";
+          }
+        })
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", function(d) { return d.r; })
+        .attr("parent", function(d) {
+          return d.parent? d.parent.id : null;
+        })
+        .style("opacity", function(d) {
+          return d.sub_categories ? 1 : 0;
+        })
+        .on("click", function(d) {
+          return d.sub_categories ? zoomIn(d) : null;
+        })
+        .on("mouseover", function(d) {
+          $("div#info").text(d.name);
+          $("circle[parent=" + d.id + "]")
+            .css("opacity", 1);
+          d3.json("/jobs.json?course=" + d.id, function(data) {
+            var jobs = findTargets(data);
+            vis.selectAll("line").data(jobs).enter()
+              .append("svg:line")
+              .attr("percent", function(d) { return d.percent; })
+              .attr("x1", d.x)
+              .attr("y1", d.y)
+              .attr("x2", function(d) { return d.targetX; })
+              .attr("y2", function(d) { return d.targetY; })
+              .style("stroke-width", function(d) { return d.percent; });
           });
-
-      d3.select(window).on("click", function() { zoom(root); });
+        })
+        .on("mouseout", function(d) {
+          $("div#info").text("");
+          $("circle[parent=" + d.id + "]")
+            .css("opacity", 0);
+          vis.selectAll("line").remove();
+        });
     });
+
+    function findTargets(arr) {
+      for (var elem in arr) {
+        var target = $("circle#" + arr[elem].target).get(0);
+        arr[elem].targetX = target.cx;
+        arr[elem].targetY = target.cy;
+      }
+      return arr;
+    }
 
 
     // -- Add jobs --
-
-    var vis2 = d3.select("#graph svg").append("svg:g");
 
     d3.json("/jobs.json", function(data) {
 
@@ -124,37 +147,112 @@ for (var i = 0; i < height; i = i + 20) {
 
       var jobs = onCircle(data);
 
-      vis2.selectAll("circle").data(jobs)
-        .enter().append("svg:circle")
-          .attr("id", function(d) { return "jobs_" + d.id; })
-          .attr("title", function(d) { return d.title; })
-          .attr("class", "job")
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; })
-          .attr("r", function(d) { return d.r; });
+      svg.append("svg:g").selectAll("circle")
+        .data(jobs)
+        .enter()
+        .append("svg:circle")
+        .attr("id", function(d) { return d.id; })
+        .attr("title", function(d) { return d.title; })
+        .attr("class", "job")
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", function(d) { return d.r; })
+        .on("mouseover", function(d) {
+          $("div#info").text(d.title);
+          d3.json("/courses.json?job=" + d.id, function(data) {
+            var jobs = findTargets(data);
+            vis.selectAll("line").data(jobs).enter()
+              .append("svg:line")
+              .attr("percent", function(d) { return d.percent; })
+              .attr("x1", d.x)
+              .attr("y1", d.y)
+              .attr("x2", function(d) { return d.targetX; })
+              .attr("y2", function(d) { return d.targetY; })
+              .style("stroke-width", function(d) { return d.percent; });
+          });
+        })
+        .on("mouseout", function(d) {
+          $("div#info").text("");
+          vis.selectAll("line").remove();
+        });
     });
 
 
     // -- Zooming --
-    // FIXME: Doesn't work
-    // var x = d3.scale.linear().range([0, diameter]),
-    //     y = d3.scale.linear().range([0, diameter]);
+    var x = d3.scale.linear().range([0, diameter]),
+        y = d3.scale.linear().range([0, diameter]);
 
-    // function zoom(d, i) {
-    //   var k = r / d.r / 2;
-    //   x.domain([d.x - d.r, d.x + d.r]);
-    //   y.domain([d.y - d.r, d.y + d.r]);
+    function zoomIn(node) {
+      var k = diameter / node.r / 2;
+      x.domain([node.x - node.r, node.x + node.r]);
+      y.domain([node.y - node.r, node.y + node.r]);
 
-    //   var t = vis.transition()
-    //       .duration(d3.event.altKey ? 7500 : 750);
+      vis.selectAll("circle")
+        .transition()
+        .duration(1000)
+        .style("opacity", function(d) {
+          return d.parent && (d.parent.id == node.id) ? 1 : 0;
+        })
+        .attr("cx", function(d) { return x(d.x); })
+        .attr("cy", function(d) { return y(d.y); })
+        .attr("r", function(d) { d.origR = d.r; return k * d.r; });
 
-    //   t.selectAll("circle")
-    //       .attr("cx", function(d) { return x(d.x); })
-    //       .attr("cy", function(d) { return y(d.y); })
-    //       .attr("r", function(d) { return k * d.r; });
-    //   node = d;
-    //   d3.event.stopPropagation();
-    // }
+      vis.selectAll("circle")
+        .on("click", zoomOut) // FIXME: Should open pop-up
+        .on("mouseover", function(d) {
+          $("div#info").text(d.name);
+        })
+        .on("mouseout", function(d) {
+          $("div#info").text("");
+        });
+
+      // FIXME
+      // $("body").on("click", function() { return zoomOut(); });
+      // d3.select(window).on("click", null);
+    }
+
+    function zoomOut() {
+      vis.selectAll("circle")
+        .transition()
+        .duration(1000)
+        .style("opacity", function(d) {
+          return d.sub_categories ? 1 : 0;
+        })
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", function(d) { return d.origR; });
+
+      vis.selectAll("circle")
+        .on("click", function(d) {
+          return d.sub_categories ? zoomIn(d) : null;
+        })
+        .on("mouseover", function(d) {
+          $("div#info").text(d.name);
+          $("circle[parent=" + d.id + "]")
+            .css("opacity", 1);
+        })
+        .on("mouseout", function(d) {
+          $("div#info").text("");
+          $("circle[parent=" + d.id + "]")
+            .css("opacity", 0);
+        });
+
+      // FIXME
+      // d3.select(window).on("click", null);
+    }
+
+    function filter(ids) {
+      d3.select("svg").selectAll("circle")
+        .filter(function(d) {
+          return $.inArray(d.id, ids) < 0;
+        })
+        .transition()
+        .duration(800)
+        .style("opacity", 0)
+        .style("visibility", "hidden")
+        .on("click", null)
+        .on("mouseover", null)
+        .on("mouseout", null);
+    }
   }
-
 };
