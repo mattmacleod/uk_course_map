@@ -9,4 +9,6 @@ UkCourseMap::Application.routes.draw do
   get "jobs.json"     => "search#jobs"
   get "filter_results.json" => "search#filter_results"
 
+  get "detail" => "search#detail"
+  
 end

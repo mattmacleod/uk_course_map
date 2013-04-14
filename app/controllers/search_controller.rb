@@ -103,4 +103,9 @@ class SearchController < ApplicationController
 
     end
 
+    def detail
+        # Something?
+        render :layout => false
+    end
+
 end

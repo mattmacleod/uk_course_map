@@ -3,7 +3,7 @@ ukcoursemap.lightbox = {
 	setup: function(){
 		// Bind to show event
 		$("h1").on("click", function(){
-			ukcoursemap.lightbox.show("http://www.bbc.co.uk");
+			ukcoursemap.lightbox.show("/detail");
 		});
 	},
 
